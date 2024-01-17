@@ -288,5 +288,8 @@ int main()
 
 	image.Export("image.bmp"); 
 
+	cout << "Hello, image" << endl; 
+
+
 	return 0; 
 }
