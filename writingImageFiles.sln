@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ppm file format", "ppm file
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "writing bmp format", "writing bmp format\writing bmp format.vcxproj", "{50A785F1-7669-4147-AEDF-405BD1D78F4A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "more ppm play", "more ppm play\more ppm play.vcxproj", "{C7CC09B5-46ED-4032-A209-593F34B4269F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{50A785F1-7669-4147-AEDF-405BD1D78F4A}.Release|x64.Build.0 = Release|x64
 		{50A785F1-7669-4147-AEDF-405BD1D78F4A}.Release|x86.ActiveCfg = Release|Win32
 		{50A785F1-7669-4147-AEDF-405BD1D78F4A}.Release|x86.Build.0 = Release|Win32
+		{C7CC09B5-46ED-4032-A209-593F34B4269F}.Debug|x64.ActiveCfg = Debug|x64
+		{C7CC09B5-46ED-4032-A209-593F34B4269F}.Debug|x64.Build.0 = Debug|x64
+		{C7CC09B5-46ED-4032-A209-593F34B4269F}.Debug|x86.ActiveCfg = Debug|Win32
+		{C7CC09B5-46ED-4032-A209-593F34B4269F}.Debug|x86.Build.0 = Debug|Win32
+		{C7CC09B5-46ED-4032-A209-593F34B4269F}.Release|x64.ActiveCfg = Release|x64
+		{C7CC09B5-46ED-4032-A209-593F34B4269F}.Release|x64.Build.0 = Release|x64
+		{C7CC09B5-46ED-4032-A209-593F34B4269F}.Release|x86.ActiveCfg = Release|Win32
+		{C7CC09B5-46ED-4032-A209-593F34B4269F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
