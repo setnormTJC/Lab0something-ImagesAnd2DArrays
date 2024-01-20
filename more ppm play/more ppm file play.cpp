@@ -26,7 +26,7 @@ void writeBlackAndWhiteBarImage(int width, int height)
 	ofstream imageFile;
 	string filename = std::to_string(width) + "x" +
 		
-					std::to_string(height) + "black-white-bar"+ ".ppm";
+					std::to_string(height) + "anotherblack-white-bar"+ ".ppm";
 	
 	imageFile.open(filename);
 
@@ -72,7 +72,7 @@ void writeRandomColors(int width, int height)
 {
 	ofstream imageFile;
 	string filename = std::to_string(width) + "x" +
-					std::to_string(height) + "random" + ".ppm";
+					std::to_string(height) + "anotherrandom" + ".ppm";
 
 	imageFile.open(filename);
 
@@ -88,6 +88,28 @@ void writeRandomColors(int width, int height)
 			imageFile << rand() % 256 << " " << rand() % 256 << rand() % 256 << endl;
 		}
 	}
+
+	imageFile.close(); 
+
+}
+
+void readppmFile_AndPrintToTerminal(string inputFileName)
+{
+	ifstream inputFile{ inputFileName };
+	if (!inputFile)
+	{
+		cout << "FNFE!" << endl; 
+		return; 
+	}
+
+	while (!inputFile.eof())
+	{
+		string currentLine; 
+		getline(inputFile, currentLine); 
+		cout << currentLine << endl; 
+	}
+
+	inputFile.close(); 
 }
 
 int main()
@@ -101,6 +123,13 @@ int main()
 
 	writeBlackAndWhiteBarImage(width, height); 
 	writeRandomColors(width, height); 
+
+	cout << "Enter filename to read and display: " << endl; 
+	string infileName; 
+	cin.ignore(); 
+	getline(cin, infileName); 
+
+	readppmFile_AndPrintToTerminal(infileName); 
 
 
 

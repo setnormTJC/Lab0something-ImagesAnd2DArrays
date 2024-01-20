@@ -5,18 +5,20 @@
 #include<iomanip>
 
 //global using directives: 
-using std::cout;
-using std::cin;
-using std::endl;
+using std::cout; 
+using std::cin; 
+using std::endl; 
 
 using std::string;
 using std::vector;
 
 using std::ofstream;
-using std::ifstream;
+using std::ifstream; 
 
-using std::setw;
-using std::left;
+using std::setw; 
+using std::left; 
+
+
 
 struct Color
 {
@@ -36,6 +38,7 @@ struct Color
 	}
 
 };
+
 
 class Image
 {
@@ -63,6 +66,74 @@ public:
 		m_colors[y * m_width + x].g = color.g;
 		m_colors[y * m_width + x].b = color.b;
 	}
+
+
+	void Read(const char* path)
+	{
+		ifstream f;
+
+		f.open(path, std::ios::in | std::ios::binary);
+
+		if (!f)
+		{
+			cout << "couldn't open file!" << endl;
+			return;
+		}
+
+		const int fileHeaderSize = 14;
+
+		const int informationHeaderSize = 40;
+
+		unsigned char fileHeader[fileHeaderSize];
+
+		f.read(reinterpret_cast<char*>(fileHeader), fileHeaderSize);
+
+		if (fileHeader[0] != 'B' || fileHeader[1] != 'M')
+		{
+			cout << "that file is NOT a bitmap image!" << endl;
+			f.close(); 
+			return; 
+		}
+
+		unsigned char informationHeader[informationHeaderSize];
+		f.read(reinterpret_cast<char*> (informationHeader), informationHeaderSize);
+
+		int fileSize = fileHeader[2] + (fileHeader[3] << 8) 
+						+ (fileHeader[4] << 16) + (fileHeader[5] << 24); //BMP spec
+
+		m_width = informationHeader[4] + (informationHeader[5] << 8)
+			+ (informationHeader[6] << 16) + (informationHeader[7] << 24);
+
+
+		m_height = informationHeader[8] + (informationHeader[9] << 8)
+			+ (informationHeader[10] << 16) + (informationHeader[11] << 24);
+
+
+		m_colors.resize(m_width * m_height); 
+
+		const int paddingAmount = ((4 - (m_width * 3) % 4) % 4);
+
+		for (int y = 0; y < m_height; y++)
+		{
+			for (int x = 0; x < m_width; x++)
+			{
+				unsigned char color[3]; 
+
+				f.read(reinterpret_cast<char*>(color), 3); //loads one pixel 
+
+				m_colors[y * m_width + x].r = static_cast<float>(color[2]); //red first (GBR in BMP)
+				m_colors[y * m_width + x].g = static_cast<float>(color[1]);
+				m_colors[y * m_width + x].b = static_cast<float>(color[0]);
+			}
+
+			f.ignore(paddingAmount); //at the end of every row 
+		}
+
+		f.close(); 
+
+		cout << "file has been read!" << endl; 
+	}
+
 
 	/// <summary>
 	/// supply a filepath to write to
@@ -191,6 +262,8 @@ public:
 			cout << color.r << "\t" << color.g << "\t" << color.b << endl;
 		}
 	}
+	
+
 
 private:
 	int m_width;
@@ -201,95 +274,32 @@ private:
 
 };
 
+
 int main()
 {
+	//ifstream ramonaFile{ "ramona.bmp", std::ios::binary }; //nope!
 
-	//const int width = 640; 
-	//const int height = 480; //AKA: 480p (a 4:3 aspect ratio)
-	//-> makes a ~1 MB filesize
-
-
-	//const int width = 1920;
-	//const int height = 1080; //AKA: 1080p (a 16:9 aspect ratio)
-	// -> makes a 6 MB filesize (6-fold increase follows from 480p being ~ 1MB)
-
-
-	//const int width = 3840;
-	//const int height = 2160; //AKA: "4K" -> double 1080p
-							//larger than my 1080p screen resolution 
-
-							//this takes a second or two! (and is 24 MB filesize) 
-
-	const int width = 680;
-	const int height = 420;
-
-
-
-	//const int width = 4; 
-	//const int height = 3; //"small" numbers - ease of analysis 
-	//4 x 3 results in 90 Byte filesize
-	//40 + 14 = 54 -> the header stuff in BMP file
-
-	//90 - 54 = 36
-	// 4 * 3 = 12
-	// 12 * 3 = 36!!!
-
-	//vector<vector<Color>> pixelColors; 
-	//
-	//for (int y = 0; y < height; y++)
+	//if (!ramonaFile)
 	//{
-	//	vector<Color> currentColumn;
-	//	float value = y * 0.1; 
-	//	Color c{ value, 1 - value, value };
-	//	currentColumn.push_back(c);
+	//	cout << "Ramona not found!" << endl;
+	//	return -4;
 	//}
 
-	Image image(width, height);
+	//while (!ramonaFile.eof())
+	//{
+	//	string currentLine; 
+	//	getline(ramonaFile, currentLine); 
+	//	cout << currentLine << endl; 
+	//}
 
-	int counter = 0;
+	ifstream ramonaFile{ "ramona.bmp", std::ios::binary }; //nope!
 
-	for (int y = 0; y < height; y++)
+	if (!ramonaFile)
 	{
-		for (int x = 0; x < width; x++)
-		{
-			//random-ish color - play with later -> values all range between 0 and 1
-			//Color c{
-			//			(float)x / (float)width,
-			//			1.0f - ((float)x / (float)width),
-			//			(float)y / (float)height
-			//};
-			//This is quite pretty :)
-
-			//silly playing 
-			if (counter % 5 == 0)
-			{
-				Color c{
-					1.0f, 0.5f, 0.7f
-				};
-
-				image.setColor(c, x, y);
-			}
-
-			else
-			{
-				Color c{
-					0.0f, 1.0f, 0.0f
-				};
-
-				image.setColor(c, x, y);
-			}
-
-			counter++;
-
-			//for examining RGB/BGR values 
-			//image.print(); 
-		}
+		cout << "Ramona not found!" << endl;
+		return -4;
 	}
 
-	image.Export("image.bmp");
 
-	cout << "Hello, image" << endl;
-
-
-	return 0;
+	return 0; 
 }
