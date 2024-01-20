@@ -189,47 +189,134 @@ vector<vector<int>> generateRandomTest2DArray(int rows, int cols)
 	return random2Dmatrix; 
 }
 
+auto generate2DArray_fromPPMFile()
+{
+	ifstream ppmFile{ "housey.ppm" };
+
+	if (!ppmFile) 
+	{
+		cout << "FNFE" << endl;  
+	}
+	
+	int count = 0; 
+	vector<int> array; 
+	int width; 
+	int height; 
+	while (!ppmFile.eof())
+	{
+		if (count < 3) //only read pixel info (first 4 lines are "header info")
+		{
+			string currentLine;
+			getline(ppmFile, currentLine);
+			if (count == 2)
+			{
+				//cout << "Line 2 contains: " << currentLine << endl; 
+				width = std::stoi(currentLine.substr(0, currentLine.find(' ')));  // a mess!
+				height = std::stoi(currentLine.substr(currentLine.find(' '),
+					currentLine.length() - currentLine.find(' '))); //even MORE of a mess :)
+
+				//cout << "Width = " << width*2
+				//	<< " Height = " << height +1 << endl; 
+				//system("pause"); 
+			}
+			count++;
+		}
+		
+		else
+		{
+			string currentLine; 
+			//ppmFile >> currentLine; 
+			getline(ppmFile, currentLine); 
+
+			array.push_back(std::stoi(currentLine)); 
+		}
+	}
+
+	//cout << "Total line count: " << array.size() << endl; 
+
+	vector<vector<int>> matrix; 
+	int otherCount = 0; 
+	for (int col = 0; col < width; col++)
+	{
+		vector<int> currentRow; 
+		for (int row = 0; row < height; row++)
+		{
+			currentRow.push_back(array[otherCount]);
+			otherCount++; 
+		}
+		matrix.push_back(currentRow); 
+	}
+	return matrix; 
+}
+
+
+void writeToTextFile(vector<vector<int>> matrix)
+{
+	ofstream outTextFile{ "compressedMatrixImage.txt" };
+	for (auto& row : matrix)
+	{
+		for (auto& element : row)
+		{
+			outTextFile << element << " ";
+		}
+		outTextFile << "\n";
+	}
+
+	outTextFile.close(); 
+}
+
+void writeToPPMFile(vector<vector<int>> matrix)
+{
+	int height = matrix.at(0).size(); 
+	int width = matrix.size(); 
+
+	ofstream imageFile;
+	string filename = std::to_string(width) + "x" +
+		std::to_string(height) + "compressedImage" + ".ppm";
+
+	imageFile.open(filename);
+
+	imageFile << "P3" << endl;
+	imageFile << std::to_string(width) << " ";
+	imageFile << std::to_string(height) << endl;
+	imageFile << "255 " << endl;
+
+	for (auto& row : matrix)
+	{
+		for (auto& element : row)
+		{
+			string stringEquivalent = std::to_string(element); 
+			imageFile << stringEquivalent << " ";
+		}
+		imageFile << "\n";
+	}
+
+	imageFile.close(); 
+}
+
 int main()
 {
 	//auto twoDarray = generateSimpleTest2DArray();
-	int rows = 60; 
-	int cols = 20; 
-	auto twoDarray = generateRandomTest2DArray(rows, cols);
+	//int rows = 60; 
+	//int cols = 20; 
+	//auto twoDarray = generateRandomTest2DArray(rows, cols);
+	auto twoDarray = generate2DArray_fromPPMFile(); 
+
+	//auto twoDarray = generateBlackAndWhiteBars_as2DArray(rows, cols);
 	cout << "The full two d array: \n";
-	print2DArray(twoDarray); 
+	//print2DArray(twoDarray); 
 	cout << "Dimensions are: " << twoDarray.size() << "x" << twoDarray.at(0).size() << endl; 
 	//using 0th row (assuming no jagged matrices)
 	cout << "\n\nReducing to average of 3 x 3 blocks (\"CHUNKS\"): " << endl; 
 	auto reducedMatrix = getReducedMatrix(twoDarray); 
 
-	//auto oneDequivalent = convert2Dto1DArray(twoDarray);
+	//print2DArray(reducedMatrix);
+	cout << "Dimensions are: " << reducedMatrix.size() << "x" << reducedMatrix.at(0).size() << endl;
 
+	writeToTextFile(reducedMatrix); //maybe online too can figure it out? 
+	writeToPPMFile(reducedMatrix); 
 
-	//double sum = 0;
-	//for (auto& element : oneDequivalent)
-	//{ 
-	//	sum += element; 
-	//	//cout << element << " ";
-	//}
-	////cout << sum << endl; 
-	////cout << "Average of full matrix: "  << sum/oneDequivalent.size() << endl; //~65
-	//
-
-	//auto reducedArray = reduceArraySize_ByFactorOf9(oneDequivalent); 
-
-	////cout << "Reduced matrix: " << endl; 
-	//double reducedSum = 0; 
-	//for (auto& element : reducedArray)
-	//{
-	//	reducedSum += element; 
-	//	//cout << element << " ";
-	//}
-	////cout << "reduced average: " << reducedSum / reducedArray.size() << endl; 
-	//
-	//cout << "\n\nThe REDUCED two d array: \n";
-	//auto reduced2DArray = convert1Dto2DArray(reducedArray); 
-	print2DArray(reducedMatrix);
-	cout << "Dimensions are: " << reducedMatrix.size() << "x" << reducedMatrix.at(0).size() << endl; 
+	cout << "\n\n";
 
 	return 0; 
 }
